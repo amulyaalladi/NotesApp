@@ -1,6 +1,6 @@
 import React from 'react'
 import { useMemo } from 'react'
-
+import NoteCard from './NoteCard'
 function Archive({ notes, onRestore, onTrash }) {
   const archivedNotes = useMemo(() => notes.filter((note) => note.archived && !note.trashed), [notes])
 

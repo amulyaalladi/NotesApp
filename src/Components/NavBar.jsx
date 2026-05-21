@@ -1,19 +1,9 @@
 import React, { useMemo } from 'react'
 import { Link, Outlet } from 'react-router-dom'
-import FilterTag from './FilterTag'
 
-const NavBar = ({ notes = [], tagFilter = '', onTagFilterChange = () => {} }) => {
-  const availableTags = useMemo(() => {
-    const activeNotes = notes.filter((note) => !note.archived && !note.trashed)
-    const tags = new Set()
-    activeNotes.forEach((note) => {
-      if (note.tags && Array.isArray(note.tags)) {
-        note.tags.forEach((tag) => tags.add(tag))
-      }
-    })
-    return Array.from(tags).sort()
-  }, [notes])
 
+const NavBar = ({ notes = [], tagFilter = '' }) => {
+  
   return (
     <>
       <header className="sticky top-0 z-20 w-full bg-slate-950/95 border-b border-slate-800/70 backdrop-blur-xl shadow-lg">
@@ -43,11 +33,7 @@ const NavBar = ({ notes = [], tagFilter = '', onTagFilterChange = () => {} }) =>
             
           </Link>
          
-          <FilterTag
-            options={availableTags}
-            selectedTag={tagFilter}
-            onFilterChange={onTagFilterChange}
-          />
+         
         </div>
         </div>
         <Outlet />
