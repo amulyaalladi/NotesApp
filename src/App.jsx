@@ -68,7 +68,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<NavBar notes={notes} tagFilter={tagFilter} onTagFilterChange={setTagFilter} />}>
-        <Route index element={<Home notes={notes} tagFilter={tagFilter} onPin={pinNote} onArchive={archiveNote} onTrash={trashNote} />} />
+        <Route index element={<Home notes={notes} tagFilter={tagFilter} onTagFilterChange={setTagFilter} onPin={pinNote} onArchive={archiveNote} onTrash={trashNote} />} />
         <Route path="new" element={<NewNote onSave={addNote} />} />
         <Route path="archive" element={<Archive notes={notes} onRestore={restoreNote} onTrash={trashNote} />} />
         <Route path="trash" element={<Trash notes={notes} onRestore={restoreNote} onDelete={deleteNote} />} />
