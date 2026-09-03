@@ -1,29 +1,38 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+// Must match BE-Notes/models/note.js's `tag` enum exactly — the backend
+// rejects any other value.
+const TAG_OPTIONS = ['work', 'personal', 'study', 'important', 'todo', 'ideas', 'others']
 
 const NewNote = ({ onSave }) => {
   const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
-  const [tags, setTags] = useState('')
+  const [description, setDescription] = useState('')
+  const [tag, setTag] = useState(TAG_OPTIONS[0])
+  const [saving, setSaving] = useState(false)
   const navigate = useNavigate()
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const trimmedTitle = title.trim()
     if (!trimmedTitle) return
 
-    const note = {
-      id: Date.now(),
-      title: trimmedTitle,
-      content: content.trim(),
-      tags: tags
-        .split(',')
-        .map((tag) => tag.trim())
-        .filter(Boolean),
-      createdAt: new Date().toISOString(),
+    setSaving(true)
+    try {
+      // Field names here (title/description/tag) match BE-Notes' Note
+      // model directly — the backend assigns the real _id and createdAt.
+      await onSave?.({
+        title: trimmedTitle,
+        description: description.trim(),
+        tag,
+      })
+      navigate('/')
+    } catch (error) {
+      const message = error.response?.data?.message || error.message || 'Failed to save note'
+      toast.error(message)
+    } finally {
+      setSaving(false)
     }
-
-    onSave?.(note)
-    navigate('/')
   }
 
   return (
@@ -42,27 +51,31 @@ const NewNote = ({ onSave }) => {
 
         <label className="mb-1 block text-sm font-medium text-slate-200">Content:</label>
         <textarea
-          value={content}
-          onChange={(event) => setContent(event.target.value)}
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
           className="mb-4 h-32 w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 focus:ring-2 focus:ring-indigo-200"
           placeholder="Write your note here..."
         ></textarea>
 
-        <label className="mb-1 block text-sm font-medium text-slate-200">Tags:</label>
-        <input
-          value={tags}
-          onChange={(event) => setTags(event.target.value)}
+        <label className="mb-1 block text-sm font-medium text-slate-200">Tag:</label>
+        <select
+          value={tag}
+          onChange={(event) => setTag(event.target.value)}
           className="mb-4 w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 focus:ring-2 focus:ring-indigo-200"
-          placeholder="Give your note a Tag..."
-        />
+        >
+          {TAG_OPTIONS.map((option) => (
+            <option key={option} value={option}>{option}</option>
+          ))}
+        </select>
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <button
             onClick={handleSave}
-            className="rounded-md bg-indigo-500 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-400"
+            disabled={saving}
+            className="rounded-md bg-indigo-500 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
             type="button"
           >
-            Save
+            {saving ? 'Saving...' : 'Save'}
           </button>
           <button
             onClick={() => navigate('/')}

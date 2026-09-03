@@ -1,4 +1,5 @@
 import React from 'react'
+import NoteCard from './NoteCard'
 
 const Trash = ({ notes, onRestore, onDelete }) => {
   const trashedNotes = notes.filter((note) => note.trashed)
@@ -10,30 +11,7 @@ const Trash = ({ notes, onRestore, onDelete }) => {
         <div className="grid gap-4 md:grid-cols-2">
           {trashedNotes.length > 0 ? (
             trashedNotes.map((note) => (
-              <article key={note.id} className="rounded-xl border border-slate-800 bg-slate-950/80 p-4 shadow-sm shadow-slate-900/30">
-                <div className="mb-3 flex items-center justify-between gap-3 text-sm text-slate-400">
-                  <span>{new Date(note.createdAt).toLocaleDateString()}</span>
-                  <span>{note.tags.length > 0 ? note.tags.join(', ') : 'No tags'}</span>
-                </div>
-                <h3 className="mb-2 text-lg font-semibold text-white">{note.title}</h3>
-                <p className="text-sm leading-6 text-slate-300">{note.content || 'No details yet.'}</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() => onRestore(note.id)}
-                    className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-100 transition hover:bg-slate-800"
-                  >
-                    Restore
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onDelete(note.id)}
-                    className="rounded-full border border-rose-500 bg-rose-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-rose-400"
-                  >
-                    Delete permanently
-                  </button>
-                </div>
-              </article>
+              <NoteCard key={note._id} note={note} onRestore={onRestore} onDelete={onDelete} />
             ))
           ) : (
             <div className="text-center text-slate-200 ">

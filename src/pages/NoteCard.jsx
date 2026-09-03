@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 
 function NoteCard({ note, onPin, onArchive, onTrash, onRestore, onDelete, pinned }) {
   const [isExpanded, setIsExpanded] = useState(false)
-  const content = note.content || 'No details yet.'
+  const content = note.description || 'No details yet.'
   const previewLength = 120
   const hasLongContent = content.length > previewLength
   const previewText = hasLongContent ? `${content.slice(0, previewLength).trim()}...` : content
@@ -45,7 +45,7 @@ function NoteCard({ note, onPin, onArchive, onTrash, onRestore, onDelete, pinned
               type="button"
               onClick={(event) => {
                 stopPropagation(event)
-                onPin(note.id)
+                onPin(note._id)
               }}
               className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-100 transition hover:bg-slate-800"
             >
@@ -57,7 +57,7 @@ function NoteCard({ note, onPin, onArchive, onTrash, onRestore, onDelete, pinned
               type="button"
               onClick={(event) => {
                 stopPropagation(event)
-                onArchive(note.id)
+                onArchive(note._id)
               }}
               className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-100 transition hover:bg-slate-800"
             >
@@ -69,7 +69,7 @@ function NoteCard({ note, onPin, onArchive, onTrash, onRestore, onDelete, pinned
               type="button"
               onClick={(event) => {
                 stopPropagation(event)
-                onTrash(note.id)
+                onTrash(note._id)
               }}
               className="inline-flex h-8 items-center justify-center rounded-full border border-rose-500 bg-black-900/10 px-3 py-1 text-xs font-semibold text-red-900 transition hover:bg-rose-500/20"
             >
@@ -81,7 +81,7 @@ function NoteCard({ note, onPin, onArchive, onTrash, onRestore, onDelete, pinned
               type="button"
               onClick={(event) => {
                 stopPropagation(event)
-                onRestore(note.id)
+                onRestore(note._id)
               }}
               className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-100 transition hover:bg-slate-800">
               Restore
@@ -92,7 +92,7 @@ function NoteCard({ note, onPin, onArchive, onTrash, onRestore, onDelete, pinned
               type="button"
               onClick={(event) => {
                 stopPropagation(event)
-                onDelete(note.id)
+                onDelete(note._id)
               }}
               className="rounded-full border border-rose-500 bg-rose-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-rose-400"
             >
@@ -113,9 +113,11 @@ function NoteCard({ note, onPin, onArchive, onTrash, onRestore, onDelete, pinned
         </div>
       )}
       <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-500">
-        {note.tags.length > 0 ? note.tags.map((tag) => (
-          <span key={tag} className="rounded-full bg-slate-100 px-2 py-1 text-slate-700">{tag}</span>
-        )) : <span className="text-slate-500">No tags</span>}
+        {note.tag ? (
+          <span className="rounded-full bg-slate-100 px-2 py-1 text-slate-700">{note.tag}</span>
+        ) : (
+          <span className="text-slate-500">No tags</span>
+        )}
       </div>
     </article>
   )

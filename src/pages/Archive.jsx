@@ -11,7 +11,7 @@ function Archive({ notes, onRestore, onTrash }) {
         <div className="grid gap-4 md:grid-cols-2">
           {archivedNotes.length > 0 ? (
             archivedNotes.map((note) => (
-              <NoteCard key={note.id} note={note} onRestore={onRestore} onTrash={onTrash} />
+              <NoteCard key={note._id} note={note} onRestore={onRestore} onTrash={onTrash} />
             ))
           ) : (
             <div className="text-center text-slate-200">

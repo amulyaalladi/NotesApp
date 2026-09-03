@@ -3,7 +3,14 @@ import { Link,Outlet } from 'react-router-dom'
 import NoteCard from './NoteCard'
 import FilterTag from '../Components/FilterTag'
 
-function Home({ notes, onPin, onArchive, onTrash, tagFilter = '' ,onTagFilterChange = () => {}}) {
+
+function Home({notes = [], onPin, onArchive, onTrash, tagFilter = '' ,onTagFilterChange = () => {}}) {
+
+  // Notes now come from App.jsx (single source of truth, fetched via
+  // getNotes() and kept in sync with the backend on every pin/archive/
+  // trash/delete action). Home previously fetched its own separate copy
+  // here, which meant the buttons on NoteCard updated App's state but
+  // this component kept rendering its own stale local copy.
   const [searchQuery, setSearchQuery] = useState('')
 
   const activeNotes = useMemo(() => notes.filter((note) => !note.archived && !note.trashed), [notes])
@@ -12,14 +19,16 @@ function Home({ notes, onPin, onArchive, onTrash, tagFilter = '' ,onTagFilterCha
     let result = activeNotes
 
     if (tagFilter) {
-      result = result.filter((note) => note.tags.includes(tagFilter))
+      // Backend's Note model has a single `tag` string, not a `tags` array
+      result = result.filter((note) => note.tag === tagFilter)
     }
 
     if (searchQuery.trim()) {
       const query = searchQuery.trim().toLowerCase()
       result = result.filter((note) => {
-        const titleMatch = note.title.toLowerCase().includes(query)
-        const contentMatch = note.content.toLowerCase().includes(query)
+        const titleMatch = (note.title || '').toLowerCase().includes(query)
+        // Backend field is `description`, not `content`
+        const contentMatch = (note.description || '').toLowerCase().includes(query)
         return titleMatch || contentMatch
       })
     }
@@ -30,9 +39,7 @@ function Home({ notes, onPin, onArchive, onTrash, tagFilter = '' ,onTagFilterCha
     const activeNotes = notes.filter((note) => !note.archived && !note.trashed)
     const tags = new Set()
     activeNotes.forEach((note) => {
-      if (note.tags && Array.isArray(note.tags)) {
-        note.tags.forEach((tag) => tags.add(tag))
-      }
+      if (note.tag) tags.add(note.tag)
     })
     return Array.from(tags).sort()
   }, [notes])
@@ -83,7 +90,7 @@ function Home({ notes, onPin, onArchive, onTrash, tagFilter = '' ,onTagFilterCha
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   {pinnedNotes.map((note) => (
-                    <NoteCard key={note.id} note={note} onPin={onPin} onArchive={onArchive} onTrash={onTrash} />
+                    <NoteCard key={note._id} note={note} onPin={onPin} onArchive={onArchive} onTrash={onTrash} />
                   ))}
                 </div>
               </section>
@@ -101,7 +108,7 @@ function Home({ notes, onPin, onArchive, onTrash, tagFilter = '' ,onTagFilterCha
               {otherNotes.length > 0 ? (
                 <div className="grid gap-4 md:grid-cols-2">
                   {otherNotes.map((note) => (
-                    <NoteCard key={note.id} note={note} onPin={onPin} onArchive={onArchive} onTrash={onTrash} />
+                    <NoteCard key={note._id} note={note} onPin={onPin} onArchive={onArchive} onTrash={onTrash} />
                   ))}
                 </div>
               ) : (

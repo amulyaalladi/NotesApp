@@ -1,9 +1,28 @@
-import React, { useMemo } from 'react'
-import { Link, Outlet } from 'react-router-dom'
+import React from 'react'
+import { Link, Outlet, useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { logout } from '../redux/authSlice'
+import { logoutUser } from '../services/authServices'
 
 
 const NavBar = ({ notes = [], tagFilter = '' }) => {
-  
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const user = useSelector((state) => state.auth.user)
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser()
+    } catch (error) {
+      // Even if the backend call fails (e.g. token already expired),
+      // still clear the local session below so the user isn't stuck.
+      console.error('logout request failed', error)
+    } finally {
+      dispatch(logout())
+      navigate('/login')
+    }
+  }
+
   return (
     <>
       <header className="sticky top-0 z-20 w-full bg-slate-950/95 border-b border-slate-800/70 backdrop-blur-xl shadow-lg">
@@ -32,8 +51,21 @@ const NavBar = ({ notes = [], tagFilter = '' }) => {
             Add Note
             
           </Link>
-         
-         
+
+          <div className="flex items-center gap-3">
+            {user?.name && (
+              <span className="hidden text-sm text-slate-300 sm:inline">
+                Hi, {user.name}
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:bg-slate-800"
+            >
+              Logout
+            </button>
+          </div>
         </div>
         </div>
         <Outlet />
